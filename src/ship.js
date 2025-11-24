@@ -3,7 +3,7 @@ export default class Ship {
   hits;
   sunk;
 
-  constructor(length, hits, sunk = false) {
+  constructor(length, hits = 0, sunk = false) {
     this.hits = hits;
     this.length = length;
     this.sunk = sunk;
@@ -17,3 +17,4 @@ export default class Ship {
     return this.hits >= this.length;
   }
 }
+
