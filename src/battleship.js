@@ -1,6 +1,6 @@
 import Player from "./player.js";
 
-export default class Game {
+export default class Battleship {
   players;
   activePlayer;
   isGameOver;
