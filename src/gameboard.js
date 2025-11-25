@@ -69,7 +69,7 @@ export default class Gameboard {
     return false;
   }
 
-  didGameEnd() {
+  isGameOver() {
     for (const ship of this.#ships) {
       if (!ship.sunk)
         return false;
