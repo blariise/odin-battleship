@@ -14,27 +14,30 @@ export default class Gameboard {
 
   addShip(ship, x, y, direction) {
     this.#checkCordinates(x, y);
-    let axis;
+    let start;
     let endCell;
+    let axis;
     switch (direction) {
       case "vertical":
-        axis = y;
-        endCell = axis + ship.length - 1;
+        start = y; // [x][i]
+        axis = "y";
+        endCell = start + ship.length - 1;
         this.#checkCordinates(x, endCell); // if cordinates are bad, throw error
         break;
       case "horizontal":
-        axis = x;
-        endCell = axis + ship.length - 1;
+        start = x; // [i][y]
+        axis = "x";
+        endCell = start + ship.length - 1;
         this.#checkCordinates(endCell, y); // if cordinates are bad, throw error
         break;
       default:
         throw new Error("Bad direction");
     }
 
-    for (let i = axis; i < endCell; ++i) {
+    for (let i = start; i <= endCell; ++i) {
       const cell = (axis === "x") ? this.board[i][y] : this.board[x][i];
+      const cords = (axis === "x") ? `(${i}, ${y})` : `(${x}, ${i})`;
       if (cell.value == "ship") {
-        const cords = (axis === "x") ? `(${i}, ${y})` : `(${x}, ${i})`;
         throw new Error(`Ship already placed at ${cords}`);
       }
       cell.value = "ship"
@@ -58,7 +61,7 @@ export default class Gameboard {
     switch(cell.value) {
       case "ship":
         cell.value = "hit";
-        cell.owner.hit();
+        cell.ship.hit();
         return true;
       case "clear":
         cell.value = "miss";
@@ -102,10 +105,34 @@ export default class Gameboard {
   }
 
   #checkCordinates(x, y) {
-    if ((x < 0 || x >= this.width) && (y < 0 || y >= this.height)) {
+    if ((x < 0 || x >= this.width) || (y < 0 || y >= this.height)) {
       throw new Error("Cordinates are out of bound");
     }
     return true;
+  }
+
+  printBoard() {
+    let i = 0;
+    let line = "";
+    for (let i = -1; i < 10; ++i) {
+      if (i === -1) {
+        line += `---`;
+      } else {
+        line += `y${i} `;
+      }
+      for (let j = -1; j < 10; ++j) {
+        if (i === -1) {
+          if (j !== -1) {
+            line += `x${j} `;
+          }
+        } else if (j !== -1) {
+          const val = this.board[i][j].value[0];
+          line += `${val}  `;
+        }
+      }
+      line += '\n';
+    }
+    console.log(line);
   }
 }
 
