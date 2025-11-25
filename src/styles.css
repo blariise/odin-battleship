@@ -12,9 +12,14 @@
   margin-top: 20px;
 }
 
-.title {
+.game-title {
   font-size: 2rem;
   font-weight: bold;
+}
+
+.boards {
+  display: flex;
+  gap: 2rem;
 }
 
 .board {

@@ -1,13 +1,16 @@
+import Ship from "./ship.js";
+
 export default class Gameboard {
   width;
   height;
   board;
-  #ships = new Array();
+  #ships;
 
   constructor(width = 10, height = 10) {
     this.width = width;
     this.height = height;
     this.board = this.#initBoard();
+    this.#ships = this.#generateShips();
   }
 
   #initBoard() {
@@ -33,7 +36,6 @@ export default class Gameboard {
         defualt:
           throw new Error("Bad direction");
       }
-      this.#ships.push(ship);
     }
   }
 
@@ -96,6 +98,25 @@ export default class Gameboard {
     }
     return true;
   }
+
+  populateBoard() {
+    const ships = this.#ships;
+    this.addShip(ships.carrier,    2, 1, "horizontal");
+    this.addShip(ships.battleship, 5, 3, "vertical");
+    this.addShip(ships.cruiser,    1, 5, "horizontal");
+    this.addShip(ships.submarine,  8, 6, "vertical");
+    this.addShip(ships.destroyer,  3, 9, "horizontal");
+  }
+
+  #generateShips() {
+    const carrier = new Ship(5);
+    const battleship = new Ship(4);
+    const cruiser = new Ship(3);
+    const submarine = new Ship(3);
+    const destroyer = new Ship(2);
+    return {carrier, battleship, cruiser, submarine, destroyer};
+  }
+
 }
 
 class Cell {
