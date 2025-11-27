@@ -148,47 +148,71 @@ export default class Gameboard {
       if (direction === "vertical") {
         if (this.#isPositionValid(left, y)) {
           outPositions.push([left, y]);
-        } else if (this.#isPositionValid(right, y)) {
+        }
+        if (this.#isPositionValid(right, y)) {
           outPositions.push([right, y]);
         }
       }
       if (direction === "horizontal") {
         if (this.#isPositionValid(x, down)) {
           outPositions.push([x, down]);
-        } else if (this.#isPositionValid(x, up)) {
+        }
+        if (this.#isPositionValid(x, up)) {
           outPositions.push([x, up]);
         }
       }
     }
-    const startX = shipPositions[0][0];
-    const startY = shipPositions[0][1];
-    const endX = shipPositions[shipPositions.length-1][0];
-    const endY = shipPositions[shipPositions.length-1][1];
-    const startPositions = this.#getBorderPositionsWithCorners(startX, startY, direction);
-    const endPositions = this.#getBorderPositionsWithCorners(endX, endY, direction);
-    outPositions.concat(startPositions).concat(endPositions);
-    return outPositions;
+
+    const sidePositions = this.#getBorderPositionsWithCorners(shipPositions, direction);
+    return outPositions.concat(sidePositions);
   }
 
-  #getBorderPositionsWithCorners(x, y, direction) {
+  #getBorderPositionsWithCorners(positions, direction) {
+    const startX = positions[0][0];
+    const startY = positions[0][1];
+    const endX = positions[positions.length-1][0];
+    const endY = positions[positions.length-1][1];
     const outPositions = new Array();
+
     switch (direction) {
-      case "horizontal":
-        --x;
-        for (let i = y-1; i < y + 2; ++i) {
-          if(this.#isPositionValid(x, i)) {
-            outPositions.push([x, i])
+
+      case "horizontal": {
+        let x = startX -1;
+        let y = startY;
+        let i = 0;
+        while (i < 2) {
+          if (i === 1) {
+            x = endX + 1;
+            y = endY;
           }
+          for (let j = y-1; j < y + 2; ++j) {
+            if(this.#isPositionValid(x, j)) {
+              outPositions.push([x, j])
+            }
+          }
+          ++i;
         }
         return outPositions;
-      case "vertical":
-        ++y;
-        for (let i = x-1; i < x + 2; ++i) {
-          if(this.#isPositionValid(i, y)) {
-            outPositions.push([i, y]);
+      }
+      case "vertical": {
+        let x = startX;
+        let y = startY - 1;
+        let i = 0;
+        while (i < 2) {
+          if (i === 1) {
+            x = endX;
+            y = endY + 1;
           }
+          for (let i = x-1; i < x + 2; ++i) {
+            console.log(i, y);
+            if(this.#isPositionValid(i, y)) {
+              outPositions.push([i, y]);
+            }
+          }
+          ++i;
         }
-        return outPositions;
+      return outPositions;
+      }
       default:
         break;
     }
