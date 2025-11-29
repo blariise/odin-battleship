@@ -1,7 +1,7 @@
 import "./styles.css";
 import Battleship from "./battleship.js";
 
-const battleship = new Battleship(true);
+const battleship = new Battleship();
 const player1 = battleship.players[0];
 const player2 = battleship.players[1];
 const player1BoardDiv = document.querySelector(".player1.board");
@@ -10,25 +10,40 @@ let playerToHit = player1;
 
 initGame();
 
-function initGame() {
+async function initGame() {
+  setVisibilityClassOnBoardDOM();
+  renderBoard(player1, player1BoardDiv);
+  renderBoard(player2, player2BoardDiv);
+  updateCellStatusOnBoard(player1, player1BoardDiv);
+  updateCellStatusOnBoard(player2, player2BoardDiv);
+
   const boardsDiv = document.querySelector(".boards");
-  boardsDiv.addEventListener("click", (e) => {
+  boardsDiv.addEventListener("click", async (e) => {
     if (e.target.className == "cell") {
-      const playerName = e.target.parentElement.parentElement.parentElement.classList[0];
+      const enemyPlayerName = e.target.parentElement.parentElement.parentElement.classList[0];
       const x = e.target.dataset.x;
       const y = e.target.dataset.y;
-      playerTurn(playerName, x, y);
-      while (playerToHit.type === "bot") {
-        botTurn();
+      if (battleship.playAgainstBot) {
+        const enemyPlayer = getPlayerByName(enemyPlayerName);
+        if (playerToHit !== player1) {
+          return;
+        }
+        await gameCycleVsBot(enemyPlayer, x, y);
       }
     }
   });
-  renderBoard(player1, player1BoardDiv);
-  renderBoard(player2, player2BoardDiv);
 }
 
-function playerTurn(playerName, x, y) {
-  const attackedPlayer = getPlayerByName(playerName);
+async function gameCycleVsBot(player, x, y) {
+  if (playerToHit === player1) {
+    while (playerTurn(player, x, y));
+  }
+  if (playerToHit.type === "bot") {
+    while (await botTurn() === "hit");
+  }
+}
+
+function playerTurn(attackedPlayer, x, y) {
   if (attackedPlayer === playerToHit) {
     return;
   }
@@ -43,22 +58,27 @@ function playerTurn(playerName, x, y) {
     default:
       return;
   }
-  updateCellStatusOnBoard(attackedPlayer, getPlayerBoardDiv(playerName));
+  updateCellStatusOnBoard(attackedPlayer, getPlayerBoardDiv(attackedPlayer));
 }
 
 function botTurn() {
-  switch(battleship.botTurn()) {
-    case "miss":
-      changePlayerToHit();
-      break;
-    case "hit":
-      break;
-    case "game-over":
-      break;
-    default:
-      return;
-  }
-  updateCellStatusOnBoard(player1, player1BoardDiv);
+  return new Promise((resolve) => setTimeout(() => {
+    switch(battleship.botTurn()) {
+      case "miss":
+        changePlayerToHit();
+        resolve("miss");
+        break;
+      case "hit":
+        resolve("hit");
+        break;
+      case "game-over":
+        resolve("hit");
+        break;
+      default:
+        return;
+    }
+    updateCellStatusOnBoard(player1, player1BoardDiv);
+  }, 500));
 }
 
 function renderBoard(player, playerBoardDiv) {
@@ -126,8 +146,8 @@ function getPlayerByName(playerName) {
   return playerName === "player1" ? player1 : player2;
 }
 
-function getPlayerBoardDiv(playerName) {
-  return playerName === "player1" ? player1BoardDiv : player2BoardDiv;
+function getPlayerBoardDiv(player) {
+  return player === player1 ? player1BoardDiv : player2BoardDiv;
 }
 
 function playAgainstBot() {
@@ -137,3 +157,10 @@ function playAgainstBot() {
 function playAgainstHuman() {
   battleship.playAgainstBot = false;
 }
+
+function setVisibilityClassOnBoardDOM() {
+  if (player2.type === "bot") {
+    player1BoardDiv.classList.add("show");
+  }
+}
+

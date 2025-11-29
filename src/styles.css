@@ -44,13 +44,6 @@ body {
   border: 1px solid black;
 }
 
-.board-row .cell[data-status="ship"] {
-  background-color: #29335C;
-}
-
-.board-row .cell[data-status="border"] {
-  background-color: grey;
-}
 
 .board-row .cell[data-status="hit"] {
   background-color: #E4572E;
@@ -60,3 +53,14 @@ body {
   background-color: #7A7977;
 }
 
+.board.show {
+  .cell[data-status="ship"] {
+    background-color: #29335C;
+  }
+}
+
+.board.hide {
+  .cell {
+    background-color: black;
+  }
+}

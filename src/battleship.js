@@ -7,6 +7,7 @@ export default class Battleship {
   playAgainstBot;
 
   constructor(playAgainstBot = true) {
+    this.playAgainstBot = playAgainstBot;
     this.players[0] = new Player("human");
     this.players[1] = playAgainstBot ? new Player("bot") : new Player("human");
     this.isGameOver = false;
@@ -30,7 +31,6 @@ export default class Battleship {
         default:
           break;
       }
-      console.log(board[x][y]);
     }
     return null;
   }
