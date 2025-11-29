@@ -17,32 +17,48 @@ function initGame() {
       const playerName = e.target.parentElement.parentElement.parentElement.classList[0];
       const x = e.target.dataset.x;
       const y = e.target.dataset.y;
-      gameCycle(playerName, x, y);
+      playerTurn(playerName, x, y);
+      while (playerToHit.type === "bot") {
+        botTurn();
+      }
     }
   });
   renderBoard(player1, player1BoardDiv);
   renderBoard(player2, player2BoardDiv);
-  updateCellStatusOnBoard(player1, player1BoardDiv);
-  updateCellStatusOnBoard(player2, player2BoardDiv);
 }
 
-function gameCycle(playerName, x, y) {
+function playerTurn(playerName, x, y) {
   const attackedPlayer = getPlayerByName(playerName);
   if (attackedPlayer === playerToHit) {
     return;
   }
   switch (attackedPlayer.gameboard.receiveAttack(x, y)) {
     case "miss":
-      console.log(playerToHit);
       changePlayerToHit();
-      console.log(playerToHit);
+      break;
     case "hit":
-      updateCellStatusOnBoard(attackedPlayer, getPlayerBoardDiv(playerName));
+      break;
+    case "game-over":
       break;
     default:
       return;
   }
   updateCellStatusOnBoard(attackedPlayer, getPlayerBoardDiv(playerName));
+}
+
+function botTurn() {
+  switch(battleship.botTurn()) {
+    case "miss":
+      changePlayerToHit();
+      break;
+    case "hit":
+      break;
+    case "game-over":
+      break;
+    default:
+      return;
+  }
+  updateCellStatusOnBoard(player1, player1BoardDiv);
 }
 
 function renderBoard(player, playerBoardDiv) {
@@ -112,4 +128,12 @@ function getPlayerByName(playerName) {
 
 function getPlayerBoardDiv(playerName) {
   return playerName === "player1" ? player1BoardDiv : player2BoardDiv;
+}
+
+function playAgainstBot() {
+  battleship.playAgainstBot = true;
+}
+
+function playAgainstHuman() {
+  battleship.playAgainstBot = false;
 }

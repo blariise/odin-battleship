@@ -54,7 +54,6 @@ export default class Gameboard {
       positions.push(position);
     }
     const borderPositions = this.#getBorderPositions(positions, direction);
-    //this.#setPositionsValueOnBoard(borderPositions, "border");
     this.#ships.push({ship, positions, borderPositions, direction});
     return true;
   }
@@ -95,8 +94,9 @@ export default class Gameboard {
 
   isGameOver() {
     for (const ship of this.#ships) {
-      if (!ship.sunk)
+      if (!ship.ship.sunk) {
         return false;
+      }
     }
     return true;
   }
