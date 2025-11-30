@@ -37,6 +37,7 @@ body {
   border-spacing: 0;
   table-layout: fixed;
   border-collapse: collapse;
+  cursor: crosshair;
 }
 
 .board-row .cell {
@@ -44,6 +45,9 @@ body {
   border: 1px solid black;
 }
 
+.board-row .cell:hover {
+  background-color: #D0D9D2;
+}
 
 .board-row .cell[data-status="hit"] {
   background-color: #E4572E;
@@ -63,4 +67,29 @@ body {
   .cell {
     background-color: black;
   }
+}
+
+.game-over-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.reload-board {
+  width: 3rem;
+  height: 3rem;
+  background-color: #123;
+  border: none;
+  color: white;
+}
+
+.reload-board:hover {
+  cursor: pointer;
 }

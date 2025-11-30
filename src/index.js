@@ -10,7 +10,7 @@ let playerToHit = player1;
 
 initGame();
 
-async function initGame() {
+function initGame() {
   setVisibilityClassOnBoardDOM();
   renderBoard(player1, player1BoardDiv);
   renderBoard(player2, player2BoardDiv);
@@ -54,6 +54,7 @@ function playerTurn(attackedPlayer, x, y) {
     case "hit":
       break;
     case "game-over":
+      showGameOverDialog();
       break;
     default:
       return;
@@ -72,6 +73,7 @@ function botTurn() {
         resolve("hit");
         break;
       case "game-over":
+        showGameOverDialog();
         resolve("hit");
         break;
       default:
@@ -163,4 +165,24 @@ function setVisibilityClassOnBoardDOM() {
     player1BoardDiv.classList.add("show");
   }
 }
+
+const dialog = document.querySelector(".game-over-dialog");
+const closeGameOverDialogButton = document.querySelector(".reset");
+
+function showGameOverDialog() {
+  dialog.showModal();
+}
+closeGameOverDialogButton.addEventListener("click", (e) => {
+  battleship.resetGame();
+  updateCellStatusOnBoard(player1, player1BoardDiv);
+  updateCellStatusOnBoard(player2, player2BoardDiv);
+  dialog.close();
+});
+
+const reloadButton = document.querySelector(".reload-board");
+reloadButton.addEventListener("click", (e) => {
+  battleship.resetGame();
+  updateCellStatusOnBoard(player1, player1BoardDiv);
+  updateCellStatusOnBoard(player2, player2BoardDiv);
+});
 

@@ -6,7 +6,6 @@ export default class Player {
   
   constructor(type) { // bot or human
     this.gameboard = new Gameboard();
-    this.gameboard.populateBoard();
     this.type = type;
   }
 }

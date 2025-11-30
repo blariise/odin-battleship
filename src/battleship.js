@@ -23,11 +23,8 @@ export default class Battleship {
       const cellValue = board[x][y].value;
       switch (cellValue) {
         case "clear":
-          this.players[0].gameboard.receiveAttack(x, y);
-          return "miss";
         case "ship":
-          this.players[0].gameboard.receiveAttack(x, y);
-          return "hit";
+          return this.players[0].gameboard.receiveAttack(x, y);
         default:
           break;
       }
@@ -37,9 +34,17 @@ export default class Battleship {
 
   #getSecondPlayer() {
     return this.playerToHit === this.players[0] ? this.players[1] : this.players[0];
-  };
+  }
+  
+  resetGame() {
+    for (const player of this.players) {
+      player.gameboard.clearBoard();
+      player.gameboard.generateShipsLayout();
+    }
+  }
 }
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
+

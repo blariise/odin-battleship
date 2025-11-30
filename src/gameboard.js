@@ -10,35 +10,25 @@ export default class Gameboard {
     this.width = width;
     this.height = height;
     this.board = this.#initBoard();
+    this.generateShipsLayout();
   }
 
   addShip(ship, x, y, direction) {
-    if (!this.#isPositionValid(x, y)) {
+    if (!this.#checkIfLegalPositionsOfShip(ship, x, y, direction)) {
       return false;
     }
+
     let start;
     let endCell;
     switch (direction) {
       case "vertical":
-        start = y; // [x][i:]
+        start = y; // [x][i]
         endCell = start + ship.length - 1;
-        if (!this.#isPositionValid(x, endCell)) {
-          return false;
-        }
         break;
       case "horizontal":
         start = x; // [i][y]
         endCell = start + ship.length - 1;
-        if (!this.#isPositionValid(endCell, y)) {
-          return false;
-        }
         break;
-      default:
-        throw new Error("Bad direction");
-    }
-
-    if (!this.#isPositionValid(x, endCell)) {
-      return false;
     }
 
     const positions = new Array();
@@ -46,25 +36,30 @@ export default class Gameboard {
     for (let i = start; i <= endCell; ++i) {
       const cell = (direction === "horizontal") ? this.board[i][y] : this.board[x][i];
       position = (direction === "horizontal") ? [i, y] : [x, i];
-      if (cell.value == "ship") {
-        throw new Error(`Ship already placed at ${position}`);
-      }
       cell.value = "ship"
       cell.ship = ship;
       positions.push(position);
     }
     const borderPositions = this.#getBorderPositions(positions, direction);
     this.#ships.push({ship, positions, borderPositions, direction});
+    this.#setPositionsValueOnBoard(borderPositions, "border");
     return true;
   }
 
-  populateBoard() {
-    const ships = this.#generateShips();
-    this.addShip(ships.carrier,    2, 1, "horizontal");
-    this.addShip(ships.battleship, 5, 3, "vertical");
-    this.addShip(ships.cruiser,    1, 5, "horizontal");
-    this.addShip(ships.submarine,  8, 6, "vertical");
-    this.addShip(ships.destroyer,  3, 9, "horizontal");
+  generateShipsLayout() {
+    const objShips = this.#generateShips();
+    const ships = Object.values(objShips); 
+    this.clearBoard();
+    for (const ship of ships) {
+      while (true) {
+        const x = getRandomInt(9);
+        const y = getRandomInt(9);
+        const direction = getRandomInt(2) === 0 ? "vertical" : "horizontal";
+        if (this.addShip(ship, x, y, direction)) {
+          break;
+        }
+      }
+    }
   }
 
   receiveAttack(x, y) {
@@ -82,7 +77,8 @@ export default class Gameboard {
         }
         return "hit";
       }
-      case "clear": {
+      case "clear":
+      case "border": {
         cell.value = "miss";
         return "miss";
       }
@@ -103,6 +99,11 @@ export default class Gameboard {
 
   getShips() {
     return this.#ships;
+  }
+
+  clearBoard() {
+    this.board = this.#initBoard();
+    this.#ships = [];
   }
 
   #getShip(cellShip) {
@@ -230,6 +231,51 @@ export default class Gameboard {
       this.board[x][y].value = value;
     }
   }
+
+  #checkIfLegalPositionsOfShip(ship, x, y, direction) {
+    if (!this.#isPositionValid(x, y)) {
+      return false;
+    }
+    let start;
+    let endCell;
+    switch (direction) {
+      case "vertical":
+        start = y; // [x][i:]
+        endCell = start + ship.length - 1;
+        if (!this.#isPositionValid(x, endCell)) {
+          return false;
+        }
+        break;
+      case "horizontal":
+        start = x; // [i][y]
+        endCell = start + ship.length - 1;
+        if (!this.#isPositionValid(endCell, y)) {
+          return false;
+        }
+        break;
+      default:
+        return false;
+    }
+
+    if (!this.#isPositionValid(x, endCell)) {
+      return false;
+    }
+
+    const positions = new Array();
+    let position;
+    for (let i = start; i <= endCell; ++i) {
+      const cell = (direction === "horizontal") ? this.board[i][y] : this.board[x][i];
+      position = (direction === "horizontal") ? [i, y] : [x, i];
+      if (cell.value === "ship" || cell.value === "border") {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
 }
 
 class Cell {
